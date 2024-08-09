@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-def plot_results(inventory, forecast, ordered, stock_min):
+def plot_results(inventory, forecast, ordered, stock_min, capacity):
     """
     Plot the results of the inventory optimization using Q-Learning
 
@@ -17,4 +17,5 @@ def plot_results(inventory, forecast, ordered, stock_min):
     plt.plot(forecast, "b", label="Forecasted consumption")
     plt.plot(ordered, "p", label="Quantity Ordered")
     plt.axhline(stock_min, color="red", label="Security Stock")
+    plt.axhline(capacity, color="orange", label="Capacity")
     plt.legend()

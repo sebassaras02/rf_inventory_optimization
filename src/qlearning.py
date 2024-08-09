@@ -20,7 +20,7 @@ class QLearningOptimizer:
         None
     """
 
-    def __init__(self, forecast, initial_stock, security_stock, n_actions, min_order, alpha=0.1, gamma=0.6, epsilon=0.1):
+    def __init__(self, forecast, initial_stock, security_stock, capacity, n_actions, min_order, alpha=0.1, gamma=0.6, epsilon=0.1):
         """
         Constructor of the Q-Learning Optimizer
         """
@@ -28,10 +28,12 @@ class QLearningOptimizer:
         self.gamma = gamma
         self.epsilon = epsilon
         self.choices = np.array(n_actions) 
+        self.raw_actions = n_actions
         self.min_order = min_order
         self.forecast = forecast
         self.initial_stock = initial_stock
         self.security_stock = security_stock
+        self.capacity = capacity
     
     def __transition(self, state, action, consuption):
         """
@@ -76,26 +78,30 @@ class QLearningOptimizer:
         # Create the Q-table
         self.q_table = np.zeros((len(self.forecast), len(self.choices)))
     
-    def __get_reward(self, current_state, threshold):
+    def __get_reward(self, current_state, security_stock, maximum_stock):
         """
         This function returns the reward based on the current state of the inventory.
 
         Args:
             current_state (int): Current state of the inventory
-            threshold (int): Security stock level
+            security_stock (int): Security stock of the inventory
+            maximum_stock (int): Maximum stock of the inventory
+            
         
         Returns:
             reward (float): Reward obtained
         """
-        if current_state <= threshold:
-            return -10
-        elif current_state > threshold and current_state <= 1.5*threshold:
-            return 100
-        elif current_state > 1.5*threshold and current_state <= 2*threshold:
-            return 0.5
-        elif current_state > 2*threshold and current_state <= 3*threshold:
-            return 0.25
-        else:
+        if current_state <= security_stock:
+            return -50
+        elif current_state > security_stock and current_state <= 0.25*maximum_stock:
+            return 10
+        elif current_state > 0.25*maximum_stock and current_state <= 0.5*maximum_stock:
+            return 20
+        elif current_state > 0.5*maximum_stock and current_state <= 0.75*maximum_stock:
+            return 2
+        elif current_state > 0.75*maximum_stock and current_state <= maximum_stock:
+            return -5
+        elif current_state > maximum_stock:
             return -50
     
     def __choose_action(self, state):
@@ -108,11 +114,14 @@ class QLearningOptimizer:
         Returns:
             action (str): Action to take
         """
+        if state > 0.8*self.capacity:
+            return "nopedir"
         if np.random.rand() < self.epsilon:
-            return np.random.choice(self.choices)  # Exploration
+            return np.random.choice(self.choices)  # Exploration       
         else:
             max_index = np.argmax(self.q_table[state])  # Explotation
             return self.choices[max_index]
+    
     
     def __update_q_table(self, action, reward, unit):
         """
@@ -127,8 +136,12 @@ class QLearningOptimizer:
         Returns:
             None
         """
-        self.q_table[unit, self.choices.index(action)] =  self.q_table[unit, self.choices.index(action)] + self.alpha * (reward + self.gamma * np.max(self.q_table[unit+1]) - self.q_table[unit, self.choices.index(action)])
-
+        index = self.raw_actions.index(action)
+        if unit < len(self.forecast) - 1:
+            self.q_table[unit, index] = self.q_table[unit, index] + self.alpha * (reward + self.gamma * np.max(self.q_table[unit+1]) - self.q_table[unit, index])
+        else:
+            # For the last state, there is no future state to consider
+            self.q_table[unit, index] = self.q_table[unit, index] + self.alpha * (reward - self.q_table[unit, index])
 
     
     def fit(self, epochs=1000):
@@ -141,15 +154,16 @@ class QLearningOptimizer:
         Returns:
             None
         """
+        self.__create_q_table()
         for epoch in range(epochs):
             state = self.initial_stock
             for unit in range(len(self.forecast)):
                 # Choose an action
-                action = self.__choose_action(state=state)
+                action = self.__choose_action(state=unit)
                 # Transition to the new state
                 new_state = self.__transition(state=state, action=action, consuption=self.forecast[unit])
                 # Get the reward
-                reward = self.__get_reward(current_state=new_state, threshold=self.security_stock)
+                reward = self.__get_reward(current_state=new_state, security_stock=self.security_stock, maximum_stock=self.capacity)
                 # Update the Q-table
                 self.__update_q_table(action=action, reward=reward, unit=unit)
                 # Update the state
@@ -168,7 +182,12 @@ class QLearningOptimizer:
             forecast (np.array): Numpy array of forecasted demand
             ordered_amount (list): List of ordered amount for each month
         """
-        inventory_levels, optimal_actions, forecast, ordered_amount = inference_values(q_table=self.q_table, choices=self.choices, forecast=self.forecast, initial_state=self.initial_stock)
+        inventory_levels, optimal_actions, forecast, ordered_amount = inference_values(
+            q_table=self.q_table, 
+            choices=self.choices, 
+            forecast=self.forecast, 
+            initial_state=self.initial_stock, 
+            min_order=self.min_order)
         return (inventory_levels, optimal_actions, forecast, ordered_amount)
     
     def plot(self):
@@ -182,4 +201,4 @@ class QLearningOptimizer:
             None   
         """
         inventory_levels, optimal_actions, forecast, ordered_amount = self.predict()
-        plot_results(inventory=inventory_levels, forecast=forecast, ordered=ordered_amount, stock_min=self.security_stock)
+        plot_results(inventory=inventory_levels, forecast=forecast, ordered=ordered_amount, stock_min=self.security_stock, capacity=self.capacity)
