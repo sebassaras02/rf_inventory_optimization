@@ -17,7 +17,7 @@ def inference_values(q_table, choices, forecast, initial_state, min_order):
         forecast (np.array): Numpy array of forecasted demand
         ordered_amount (list): List of ordered amount for each month
     """
-    inventory_levels = [initial_state]
+    inventory_levels = []
     optimal_actions = []
     ordered_amount = []
 

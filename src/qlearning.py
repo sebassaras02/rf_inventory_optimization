@@ -20,7 +20,7 @@ class QLearningOptimizer:
         None
     """
 
-    def __init__(self, forecast, initial_stock, security_stock, capacity, n_actions, min_order, alpha=0.1, gamma=0.6, epsilon=0.1):
+    def __init__(self, forecast, initial_stock, security_stock, capacity, n_actions, min_order, lead_time, alpha=0.1, gamma=0.6, epsilon=0.1):
         """
         Constructor of the Q-Learning Optimizer
         """
@@ -34,6 +34,9 @@ class QLearningOptimizer:
         self.initial_stock = initial_stock
         self.security_stock = security_stock
         self.capacity = capacity
+        self.lead_time = lead_time
+        self.orders_done = []
+        self.orders_arrived = []
     
     def __transition(self, state, action, consuption):
         """
@@ -51,19 +54,27 @@ class QLearningOptimizer:
 
         # Add the order to the state
         if action == "minimo":
-            new_state += self.min_order
+            orden_asked = self.min_order
+            new_state += orden_asked
         elif action == "2minimo":
-            new_state += 2 * self.min_order
+            orden_asked = 2 * self.min_order
+            new_state += orden_asked
         elif action == "3minimo":
-            new_state += 3 * self.min_order
+            orden_asked = 3 * self.min_order
+            new_state += orden_asked
         elif action == "4minimo":
+            orden_asked = 4 * self.min_order
             new_state += 4 * self.min_order
         elif action == "nopedir":
+            orden_asked = 0
             new_state = new_state
         
-        # Reduce the state by the consuption
-        new_state -= consuption
-        return new_state
+        if consuption > 0: 
+            # Reduce the state by the consuption
+            new_state -= consuption
+            return new_state, orden_asked
+        else:
+            return new_state
     
     def __create_q_table(self):
         """
@@ -92,7 +103,7 @@ class QLearningOptimizer:
             reward (float): Reward obtained
         """
         if current_state <= security_stock:
-            return -50
+            return -100
         elif current_state > security_stock and current_state <= 0.25*maximum_stock:
             return 10
         elif current_state > 0.25*maximum_stock and current_state <= 0.5*maximum_stock:
@@ -157,11 +168,25 @@ class QLearningOptimizer:
         self.__create_q_table()
         for epoch in range(epochs):
             state = self.initial_stock
+            # create a list to save the order done
+            orders = []
             for unit in range(len(self.forecast)):
                 # Choose an action
                 action = self.__choose_action(state=unit)
-                # Transition to the new state
-                new_state = self.__transition(state=state, action=action, consuption=self.forecast[unit])
+                # Track the action to consider the lead time
+                if action != "nopedir":
+                    orders.append((action, unit))
+                
+                # Process pending orders if any
+                if len(orders) > 0:
+                    for pending_action, order_unit in orders[:]:
+                        if unit == order_unit + self.lead_time:
+                            state = self.__transition(state=state, action=pending_action, consuption=0)
+                            orders.remove((pending_action, order_unit))
+                
+                # Apply consumption for the current unit
+                new_state = self.__transition(state=state, action="nopedir", consuption=self.forecast[unit])
+            
                 # Get the reward
                 reward = self.__get_reward(current_state=new_state, security_stock=self.security_stock, maximum_stock=self.capacity)
                 # Update the Q-table
