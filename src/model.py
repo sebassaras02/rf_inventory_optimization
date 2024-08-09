@@ -1,6 +1,23 @@
 import numpy as np
 
 class InventoryOptimizerQLearning:
+    """
+    Inventory Optimizer using Q-Learning for Reinforcement Learning
+
+    Args:
+        forecast (np.array): Numpy array of forecasted demand
+        initial_stock (int): Initial stock of the inventory
+        security_stock (int): Security stock of the inventory
+        n_actions (list): List of possible actions
+        min_order (int): Minimum order quantity
+        alpha (float): Learning rate
+        gamma (float): Discount factor
+        epsilon (float): Exploration rate
+
+    Returns:
+        None
+    """
+
     def __init__(self, forecast, initial_stock, security_stock, n_actions, min_order, alpha=0.1, gamma=0.6, epsilon=0.1):
         self.alpha = alpha
         self.gamma = gamma
