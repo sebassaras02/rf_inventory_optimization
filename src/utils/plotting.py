@@ -13,9 +13,12 @@ def plot_results(inventory, forecast, ordered, stock_min, capacity):
     Returns:
         None
     """
+    plt.figure(figsize=(7, 4), dpi=100)
     plt.plot(inventory, "g" , label="Inventory variation")
     plt.plot(forecast, "b", label="Forecasted consumption")
     plt.plot(ordered, "p", label="Quantity Ordered")
     plt.axhline(stock_min, color="red", label="Security Stock")
     plt.axhline(capacity, color="orange", label="Capacity")
+    plt.title("Inventory Optimization using Q-Learning")
+    plt.grid()
     plt.legend()
