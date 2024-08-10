@@ -214,8 +214,8 @@ class QLearningOptimizer:
                 self.__update_q_table(action=action, reward=reward, unit=unit)
                 # Update the state
                 state = new_state
-                # Decay epsilon
-                self.epsilon = max(0.01, self.epsilon * 0.995)  # Evitar que baje de 0.01
+            # Decay epsilon
+            self.epsilon = max(0.01, self.epsilon * 0.995)  # Evitar que baje de 0.01
         return self.q_table
 
     def predict(self):
