@@ -35,8 +35,7 @@ class QLearningOptimizer:
         self.security_stock = security_stock
         self.capacity = capacity
         self.lead_time = lead_time
-        self.orders_done = []
-        self.orders_arrived = []
+        self.thresholds = np.linspace(security_stock, capacity, num=5)[1:] 
     
     def __transition(self, state, action, consuption):
         """
@@ -64,7 +63,13 @@ class QLearningOptimizer:
             new_state += orden_asked
         elif action == "4minimo":
             orden_asked = 4 * self.min_order
-            new_state += 4 * self.min_order
+            new_state += orden_asked
+        elif action == "5minimo":
+            orden_asked = 5 * self.min_order
+            new_state += orden_asked
+        elif action == "6minimo":
+            orden_asked = 6 * self.min_order
+            new_state += orden_asked
         elif action == "nopedir":
             orden_asked = 0
             new_state = new_state
@@ -72,7 +77,7 @@ class QLearningOptimizer:
         if consuption > 0: 
             # Reduce the state by the consuption
             new_state -= consuption
-            return new_state, orden_asked
+            return new_state
         else:
             return new_state
     
@@ -102,18 +107,20 @@ class QLearningOptimizer:
         Returns:
             reward (float): Reward obtained
         """
-        if current_state <= security_stock:
-            return -100
-        elif current_state > security_stock and current_state <= 0.25*maximum_stock:
+        if current_state <= 0:
+            return -20000
+        elif current_state > 0 and current_state <= security_stock:
+            return -2000
+        elif current_state > security_stock and current_state <= self.thresholds[0]:
+            return 100
+        elif current_state > self.thresholds[0] and current_state <= self.thresholds[1]:
+            return 2000
+        elif current_state > self.thresholds[1] and current_state <= self.thresholds[2]:
             return 10
-        elif current_state > 0.25*maximum_stock and current_state <= 0.5*maximum_stock:
-            return 20
-        elif current_state > 0.5*maximum_stock and current_state <= 0.75*maximum_stock:
-            return 2
-        elif current_state > 0.75*maximum_stock and current_state <= maximum_stock:
-            return -5
+        elif current_state > self.thresholds[2] and current_state <= maximum_stock:
+            return -1
         elif current_state > maximum_stock:
-            return -50
+            return -10000
     
     def __choose_action(self, state):
         """"
@@ -125,14 +132,19 @@ class QLearningOptimizer:
         Returns:
             action (str): Action to take
         """
+        buffer = self.security_stock*1.2
+        
         if state > 0.8*self.capacity:
             return "nopedir"
-        if np.random.rand() < self.epsilon:
-            return np.random.choice(self.choices)  # Exploration       
+        elif state <= buffer:
+            current_choices = self.choices[self.choices != "nopedir"]
+            return np.random.choice(current_choices)
         else:
-            max_index = np.argmax(self.q_table[state])  # Explotation
-            return self.choices[max_index]
-    
+            if np.random.rand() < self.epsilon:
+                return np.random.choice(self.choices)  # Exploración       
+            else:
+                max_index = np.argmax(self.q_table[state])  # Explotación
+                return self.choices[max_index]
     
     def __update_q_table(self, action, reward, unit):
         """
@@ -148,13 +160,22 @@ class QLearningOptimizer:
             None
         """
         index = self.raw_actions.index(action)
-        if unit < len(self.forecast) - 1:
-            self.q_table[unit, index] = self.q_table[unit, index] + self.alpha * (reward + self.gamma * np.max(self.q_table[unit+1]) - self.q_table[unit, index])
-        else:
-            # For the last state, there is no future state to consider
-            self.q_table[unit, index] = self.q_table[unit, index] + self.alpha * (reward - self.q_table[unit, index])
-
     
+        if unit < len(self.forecast) - 2:
+            max_next_q = np.max(self.q_table[unit + 1])
+            max_next_next_q = np.max(self.q_table[unit + 2])
+            # Weighted average of the next two states' Q-values
+            future_q = 0.5 * max_next_q + 0.5 * max_next_next_q
+        elif unit < len(self.forecast) - 1:
+            # Only one future state left to consider
+            future_q = np.max(self.q_table[unit + 1])
+        else:
+            # No future state left
+            future_q = 0
+
+        # Q-learning update rule with lookahead
+        self.q_table[unit, index] = self.q_table[unit, index] + self.alpha * (reward + self.gamma * future_q - self.q_table[unit, index])
+        
     def fit(self, epochs=1000):
         """
         This function trains the Q-Learning model to optimize the inventory levels.
@@ -193,6 +214,9 @@ class QLearningOptimizer:
                 self.__update_q_table(action=action, reward=reward, unit=unit)
                 # Update the state
                 state = new_state
+                # Decay epsilon
+                self.epsilon = max(0.01, self.epsilon * 0.995)  # Evitar que baje de 0.01
+        return self.q_table
 
     def predict(self):
         """
@@ -207,15 +231,16 @@ class QLearningOptimizer:
             forecast (np.array): Numpy array of forecasted demand
             ordered_amount (list): List of ordered amount for each month
         """
-        inventory_levels, optimal_actions, forecast, ordered_amount = inference_values(
+        inventory_levels, optimal_actions, forecast, orders_placed, orders_received = inference_values(
             q_table=self.q_table, 
             choices=self.choices, 
             forecast=self.forecast, 
             initial_state=self.initial_stock, 
-            min_order=self.min_order)
-        return (inventory_levels, optimal_actions, forecast, ordered_amount)
+            min_order=self.min_order,
+            lead_time=self.lead_time)
+        return (inventory_levels, optimal_actions, forecast, orders_placed, orders_received)
     
-    def plot(self):
+    def plot(self, type):
         """
         Plot the results of the inventory optimization using Q-Learning.
 
@@ -225,5 +250,5 @@ class QLearningOptimizer:
         Returns:
             None   
         """
-        inventory_levels, optimal_actions, forecast, ordered_amount = self.predict()
-        plot_results(inventory=inventory_levels, forecast=forecast, ordered=ordered_amount, stock_min=self.security_stock, capacity=self.capacity)
+        inventory_levels, optimal_actions, forecast, orders_placed, orders_received = self.predict()
+        plot_results(inventory=inventory_levels, forecast=forecast, orders_placed=orders_placed, orders_received=orders_received, stock_min=self.security_stock, capacity=self.capacity, type=type)
