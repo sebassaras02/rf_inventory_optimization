@@ -1,6 +1,6 @@
 import numpy as np
 
-def inference_values(q_table, choices, forecast, initial_state, min_order):
+def inference_values(q_table, choices, forecast, initial_state, min_order, lead_time):
     """
     Inference function to get the inventory levels, optimal actions, forecast and ordered amount based on the results of the Q-Learning algorithm.
 
@@ -20,9 +20,11 @@ def inference_values(q_table, choices, forecast, initial_state, min_order):
     inventory_levels = []
     optimal_actions = []
     ordered_amount = []
+    orders_placed = [0] * len(forecast)
+    orders_received = [0] * len(forecast)
 
     current_state = initial_state
-    order_value = 0
+    orders = []
 
     for iteration in range(len(forecast)):
 
@@ -45,11 +47,31 @@ def inference_values(q_table, choices, forecast, initial_state, min_order):
             order_value = 3 * min_order
         elif best_action == "4minimo":
             order_value = 4 * min_order
+        elif best_action == "5minimo":
+            order_value = 5 * min_order
+        elif best_action == "6minimo":
+            order_value = 6 * min_order
+        
+        # record the order placed
+        orders_placed[iteration] = order_value
 
-        ordered_amount.append(order_value)
+        if order_value > 0:
+            orders.append({
+                "quantity": order_value,
+                "unit_ordered": iteration,
+                "unit_arrival": iteration + lead_time
+            })
+            
+        # Apply pending orders if their arrival time has come
+        for order in orders[:]:
+            if iteration == order["unit_arrival"]:
+                current_state += order["quantity"]
+                orders_received[iteration] = order["quantity"]
+                orders.remove(order)
 
         # Update the inventory level based on the forecast and the ordered amount
-        current_state += order_value - forecast[iteration]
+        current_state -= forecast[iteration]
         inventory_levels.append(current_state)
+        ordered_amount.append(order_value)
     
-    return inventory_levels, optimal_actions, forecast, ordered_amount
+    return inventory_levels, optimal_actions, forecast, orders_placed, orders_received
