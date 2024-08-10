@@ -112,11 +112,11 @@ class QLearningOptimizer:
         elif current_state > 0 and current_state <= security_stock:
             return -2000
         elif current_state > security_stock and current_state <= self.thresholds[0]:
-            return 100
+            return 5
         elif current_state > self.thresholds[0] and current_state <= self.thresholds[1]:
             return 2000
         elif current_state > self.thresholds[1] and current_state <= self.thresholds[2]:
-            return 10
+            return 100
         elif current_state > self.thresholds[2] and current_state <= maximum_stock:
             return -1
         elif current_state > maximum_stock:
@@ -165,7 +165,7 @@ class QLearningOptimizer:
             max_next_q = np.max(self.q_table[unit + 1])
             max_next_next_q = np.max(self.q_table[unit + 2])
             # Weighted average of the next two states' Q-values
-            future_q = 0.5 * max_next_q + 0.5 * max_next_next_q
+            future_q = 1 * max_next_q + 2 * max_next_next_q
         elif unit < len(self.forecast) - 1:
             # Only one future state left to consider
             future_q = np.max(self.q_table[unit + 1])
