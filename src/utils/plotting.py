@@ -79,7 +79,6 @@ def plot_results(inventory, forecast, orders_placed, orders_received, stock_min,
         showlegend=True
     )
 
-    # Mostrar la figura
     fig.show()
     
     return fig

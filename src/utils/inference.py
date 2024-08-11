@@ -37,19 +37,19 @@ def inference_values(q_table, choices, forecast, initial_state, min_order, lead_
         optimal_actions.append(best_action)
 
         # Determine the amount to order based on the best action
-        if best_action == "nopedir":
+        if best_action == "no":
             order_value = 0
-        elif best_action == "minimo":
+        elif best_action == "m":
             order_value = min_order
-        elif best_action == "2minimo":
+        elif best_action == "2m":
             order_value = 2 * min_order
-        elif best_action == "3minimo":
+        elif best_action == "3m":
             order_value = 3 * min_order
-        elif best_action == "4minimo":
+        elif best_action == "4m":
             order_value = 4 * min_order
-        elif best_action == "5minimo":
+        elif best_action == "5m":
             order_value = 5 * min_order
-        elif best_action == "6minimo":
+        elif best_action == "6m":
             order_value = 6 * min_order
         
         # record the order placed

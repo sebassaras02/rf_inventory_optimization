@@ -52,25 +52,25 @@ class QLearningOptimizer:
         new_state = state
 
         # Add the order to the state
-        if action == "minimo":
+        if action == "m":
             orden_asked = self.min_order
             new_state += orden_asked
-        elif action == "2minimo":
+        elif action == "2m":
             orden_asked = 2 * self.min_order
             new_state += orden_asked
-        elif action == "3minimo":
+        elif action == "3m":
             orden_asked = 3 * self.min_order
             new_state += orden_asked
-        elif action == "4minimo":
+        elif action == "4m":
             orden_asked = 4 * self.min_order
             new_state += orden_asked
-        elif action == "5minimo":
+        elif action == "5m":
             orden_asked = 5 * self.min_order
             new_state += orden_asked
-        elif action == "6minimo":
+        elif action == "6m":
             orden_asked = 6 * self.min_order
             new_state += orden_asked
-        elif action == "nopedir":
+        elif action == "no":
             orden_asked = 0
             new_state = new_state
         
@@ -135,9 +135,9 @@ class QLearningOptimizer:
         buffer = self.security_stock*1.2
         
         if state > 0.8*self.capacity:
-            return "nopedir"
+            return "no"
         elif state <= buffer:
-            current_choices = self.choices[self.choices != "nopedir"]
+            current_choices = self.choices[self.choices != "no"]
             return np.random.choice(current_choices)
         else:
             if np.random.rand() < self.epsilon:
@@ -195,7 +195,7 @@ class QLearningOptimizer:
                 # Choose an action
                 action = self.__choose_action(state=unit)
                 # Track the action to consider the lead time
-                if action != "nopedir":
+                if action != "no":
                     orders.append((action, unit))
                 
                 # Process pending orders if any
@@ -206,7 +206,7 @@ class QLearningOptimizer:
                             orders.remove((pending_action, order_unit))
                 
                 # Apply consumption for the current unit
-                new_state = self.__transition(state=state, action="nopedir", consuption=self.forecast[unit])
+                new_state = self.__transition(state=state, action="no", consuption=self.forecast[unit])
             
                 # Get the reward
                 reward = self.__get_reward(current_state=new_state, security_stock=self.security_stock, maximum_stock=self.capacity)
@@ -215,8 +215,7 @@ class QLearningOptimizer:
                 # Update the state
                 state = new_state
             # Decay epsilon
-            self.epsilon = max(0.01, self.epsilon * 0.995)  # Evitar que baje de 0.01
-        return self.q_table
+            self.epsilon = max(0.01, self.epsilon * 0.995)  # To ensure that epsilon does not go below 0.01
 
     def predict(self):
         """
