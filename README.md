@@ -3,8 +3,8 @@
 This repository contains a Python implementation of an inventory optimization model using Q-Learning, a Reinforcement Learning (RL) algorithm. The model is designed to help manage inventory levels by making optimal decisions on order quantities based on forecasted demand, initial stock levels, and inventory capacity.
 
 ## 📑 Table of Contents
-- [Introduction](#introduction)
-- [Features](#features)
+- [Introduction](#🚀 Introduction)
+- [Features](#✨ Features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Customization](#customization)
@@ -90,7 +90,7 @@ You can customize the behavior of the agent modifying the parameters for trainin
 
 If you find this inventory optimization tool helpful and would like to support its continued development, consider buying me a coffee. Your support helps maintain and improve this project!
 
-[![Buy Me A Coffee](https://www.paypal.com/paypalme/sebassarasti)]
+[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.paypal.com/paypalme/sebassarasti)
 
 ### Other Ways to Support
 - ⭐ Star this repository
