@@ -2,16 +2,6 @@
 
 This repository contains a Python implementation of an inventory optimization model using Q-Learning, a Reinforcement Learning (RL) algorithm. The model is designed to help manage inventory levels by making optimal decisions on order quantities based on forecasted demand, initial stock levels, and inventory capacity.
 
-## 📑 Table of Contents
-- [Introduction](#🚀 Introduction)
-- [Features](#✨ Features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Customization](#customization)
-- [Results](#results)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## 🚀 Introduction
 
 Efficient inventory management is crucial for reducing costs and avoiding stockouts or overstocking. This project implements a Q-Learning-based optimizer that learns to make optimal inventory decisions over time. It considers factors such as forecasted demand, security stock, and inventory capacity to minimize costs and maintain optimal stock levels.

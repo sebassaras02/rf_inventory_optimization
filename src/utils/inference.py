@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def inference_values(q_table, choices, forecast, initial_state, min_order, lead_time):
     """
     Inference function to get the inventory levels, optimal actions, forecast and ordered amount based on the results of the Q-Learning algorithm.
@@ -10,7 +11,7 @@ def inference_values(q_table, choices, forecast, initial_state, min_order, lead_
         forecast (np.array): Numpy array of forecasted demand
         initial_state (dict): Dictionary with the initial state of the inventory
         min_order (int): Minimum order value
-    
+
     Returns:
         inventory_levels (list): List of inventory levels for each month
         optimal_actions (list): List of optimal actions for each month
@@ -27,10 +28,9 @@ def inference_values(q_table, choices, forecast, initial_state, min_order, lead_
     orders = []
 
     for iteration in range(len(forecast)):
-
         if iteration == 0:
             current_state = initial_state
-        
+
         # Obtain the best action based on the Q-Table
         best_action_index = np.argmax(q_table[iteration])
         best_action = choices[best_action_index]
@@ -51,17 +51,19 @@ def inference_values(q_table, choices, forecast, initial_state, min_order, lead_
             order_value = 5 * min_order
         elif best_action == "6m":
             order_value = 6 * min_order
-        
+
         # record the order placed
         orders_placed[iteration] = order_value
 
         if order_value > 0:
-            orders.append({
-                "quantity": order_value,
-                "unit_ordered": iteration,
-                "unit_arrival": iteration + lead_time
-            })
-            
+            orders.append(
+                {
+                    "quantity": order_value,
+                    "unit_ordered": iteration,
+                    "unit_arrival": iteration + lead_time,
+                }
+            )
+
         # Apply pending orders if their arrival time has come
         for order in orders[:]:
             if iteration == order["unit_arrival"]:
@@ -73,5 +75,5 @@ def inference_values(q_table, choices, forecast, initial_state, min_order, lead_
         current_state -= forecast[iteration]
         inventory_levels.append(current_state)
         ordered_amount.append(order_value)
-    
+
     return inventory_levels, optimal_actions, forecast, orders_placed, orders_received
