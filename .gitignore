@@ -1,3 +1,15 @@
 notebooks
 data
 __pycache__/
+build
+dist
+.ruff_cache
+.env
+.venv/
+.idea/
+.tox/
+.nox/
+.coverage
+*.egg-info/
+build/
+dist/

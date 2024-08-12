@@ -1,6 +1,6 @@
 import numpy as np
-from utils.inference import inference_values
-from utils.plotting import plot_results
+from .utils.inference import inference_values
+from .utils.plotting import plot_results
 
 
 class QLearningOptimizer:
