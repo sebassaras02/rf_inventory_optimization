@@ -13,6 +13,20 @@ Efficient inventory management is crucial for reducing costs and avoiding stocko
 - 🛠️ **Customizable Parameters**: Adjustable learning rate, discount factor, and exploration rate.
 - 📈 **Visualizations**: Plots inventory levels, forecast, and order amounts to provide insights into the optimization process.
 
+
+## Installation 🚀
+
+You can install the `RLInventoryOpt` library directly from GitHub. Follow the instructions below to get started!
+
+### Install from GitHub 🌟
+
+To install the library directly from GitHub, use the following command:
+
+```bash
+pip install git+https://github.com/sebassaras02/rf_inventory_optimization
+```
+
+
 ## 🔧 Usage
 Initialize the Model
 
@@ -26,7 +40,7 @@ To create any model for inventory optimization, you have to follow this:
 
 
 ```python
-from QLearningOptimizer import QLearningOptimizer
+from RLInventoryOpt.qlearning import QLearningOptimizer
 import numpy as np
 
 # Example forecasted demand for 6 months
