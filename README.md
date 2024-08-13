@@ -82,6 +82,8 @@ predictions = model.predict()
 model.plot("bar")
 ```
 
+A detailed explanation can be found on this article on Medium: https://lnkd.in/gDEvav59
+
 ## ⚙️ Customization
 
 You can customize the behavior of the agent modifying the parameters for training.
