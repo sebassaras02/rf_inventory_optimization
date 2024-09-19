@@ -1,3 +1,27 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "RLInventoryOpt"
+version = "0.1.0"
+description = "Launching the first version of the RLInventoryOpt library! This version includes a fully functional Q-Learning-based inventory optimization model."
+readme = "README.md"
+authors = [{ name = "Sebastian Sarasti", email = "sebitas.alejo@hotmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["Reinforcement Learning", "Q-Learning", "Inventory Optimization"]
+dependencies = [
+    "numpy==1.26.4",
+    "pandas==2.2.2",
+    "plotly==5.22.0"
+]
+requires-python = ">=3.11.5"
+
+[project.urls]
+Homepage = "https://github.com/sebassaras02/rf_inventory_optimization"
+Explanation = "https://medium.com/@sebitas.alejo/reinforcement-learning-for-inventory-optimization-f63c26a59c19"
