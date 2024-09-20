@@ -17,7 +17,7 @@ setup(
     url="https://github.com/sebassaras02/rf_inventory_optimization",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    install_requires=parse_requirements("requirements.txt"), 
+    # install_requires=parse_requirements("requirements.txt"), 
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
