@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [code_linting, code_formating]
     if: |
-      (needs.code_linting.result == 'success' ||
+      (needs.code_linting.result == 'true' ||
       (needs.code_linting.result == 'failure' && needs.code_formatting.result == 'success'))
     steps:
       - name: Checkout code
