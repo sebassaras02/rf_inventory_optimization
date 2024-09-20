@@ -23,7 +23,7 @@ You can install the `RLInventoryOpt` library directly from GitHub. Follow the in
 To install the library directly from GitHub, use the following command:
 
 ```bash
-pip install git+https://github.com/sebassaras02/rf_inventory_optimization
+pip install RLInventoryOpt
 ```
 
 
