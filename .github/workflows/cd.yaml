@@ -1,4 +1,4 @@
-name: Continuous Deployment Workflow to Publish Python 🐍 distribution 📦
+name: Continuous Deployment Workflow 
 run-name: CD
 
 on:
@@ -58,3 +58,5 @@ jobs:
 
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
