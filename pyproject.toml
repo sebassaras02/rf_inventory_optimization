@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "RLInventoryOpt"
-version = "0.1.2"
-description = "Launching version 0.1.2. This version allows to add any action which is n-time the request."
+version = "0.1.3"
+description = "Launching over version 0.1.2. This just solve the typo in consumption."
 readme = "README.md"
 authors = [{ name = "Sebastian Sarasti", email = "sebitas.alejo@hotmail.com" }]
 license = { file = "LICENSE" }
