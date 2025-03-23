@@ -62,16 +62,15 @@ class QLearningOptimizer:
         Returns:
             new_state (int): New state of the inventory
         """
-        new_state = state
-
-        # Extraer el número de múltiplos de min_order (si aplica)
-        if action != "no":
-            multiplier = int(action.replace("m", "")) if action[:-1].isdigit() else 1
-            new_state += multiplier * self.min_order
-
-        # Aplicar consumo
-        new_state -= consumption if consumption > 0 else 0
-
+        if action == "no":
+            orden_asked = 0
+        else:
+            try:
+                multiplier = int(action.rstrip("m"))
+            except ValueError:
+                multiplier = 0 
+            orden_asked = multiplier * self.min_order
+            new_state += orden_asked
         return new_state
 
     def __create_q_table(self):
