@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "RLInventoryOpt"
-version = "0.1.4"
+version = "0.1.5"
 description = "Launching over version 0.1.2. Solving the actions list as input."
 readme = "README.md"
 authors = [{ name = "Sebastian Sarasti", email = "sebitas.alejo@hotmail.com" }]

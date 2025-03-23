@@ -62,15 +62,20 @@ class QLearningOptimizer:
         Returns:
             new_state (int): New state of the inventory
         """
+        new_state = state
         if action == "no":
             orden_asked = 0
         else:
             try:
                 multiplier = int(action.rstrip("m"))
             except ValueError:
-                multiplier = 0 
+                multiplier = 0  
             orden_asked = multiplier * self.min_order
             new_state += orden_asked
+
+        if consumption > 0:
+            new_state -= consumption
+
         return new_state
 
     def __create_q_table(self):
