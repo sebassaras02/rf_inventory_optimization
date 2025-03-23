@@ -68,7 +68,7 @@ class QLearningOptimizer:
             try:
                 multiplier = int(action.rstrip("m"))
             except ValueError:
-                multiplier = 0 
+                multiplier = 0
             orden_asked = multiplier * self.min_order
             new_state += orden_asked
         return new_state
