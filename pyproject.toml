@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "RLInventoryOpt"
-version = "0.1.1"
-description = "Launching the first version of the RLInventoryOpt library! This version includes a fully functional Q-Learning-based inventory optimization model."
+version = "0.1.2"
+description = "Launching version 0.1.2. This version allows to add any action which is n-time the request."
 readme = "README.md"
 authors = [{ name = "Sebastian Sarasti", email = "sebitas.alejo@hotmail.com" }]
 license = { file = "LICENSE" }

@@ -50,49 +50,29 @@ class QLearningOptimizer:
         self.lead_time = lead_time
         self.thresholds = np.linspace(security_stock, capacity, num=5)[1:]
 
-    def __transition(self, state, action, consuption):
+    def __transition(self, state, action, consumption):
         """
-        This function transitions to the new state based on the action taken and the consuption of the month.
+        This function transitions to the new state based on the action taken and the consumption of the month.
 
         Args:
             state (int): Current state of the inventory
             action (str): Action taken
-            consuption (int): Consuption of the month
+            consumption (int): Consumption of the month
 
         Returns:
             new_state (int): New state of the inventory
         """
         new_state = state
 
-        # Add the order to the state
-        if action == "m":
-            orden_asked = self.min_order
-            new_state += orden_asked
-        elif action == "2m":
-            orden_asked = 2 * self.min_order
-            new_state += orden_asked
-        elif action == "3m":
-            orden_asked = 3 * self.min_order
-            new_state += orden_asked
-        elif action == "4m":
-            orden_asked = 4 * self.min_order
-            new_state += orden_asked
-        elif action == "5m":
-            orden_asked = 5 * self.min_order
-            new_state += orden_asked
-        elif action == "6m":
-            orden_asked = 6 * self.min_order
-            new_state += orden_asked
-        elif action == "no":
-            orden_asked = 0
-            new_state = new_state
+        # Extraer el número de múltiplos de min_order (si aplica)
+        if action != "no":
+            multiplier = int(action.replace("m", "")) if action[:-1].isdigit() else 1
+            new_state += multiplier * self.min_order
 
-        if consuption > 0:
-            # Reduce the state by the consuption
-            new_state -= consuption
-            return new_state
-        else:
-            return new_state
+        # Aplicar consumo
+        new_state -= consumption if consumption > 0 else 0
+
+        return new_state
 
     def __create_q_table(self):
         """
