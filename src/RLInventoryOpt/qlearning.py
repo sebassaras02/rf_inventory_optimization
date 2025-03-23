@@ -198,13 +198,13 @@ class QLearningOptimizer:
                     for pending_action, order_unit in orders[:]:
                         if unit == order_unit + self.lead_time:
                             state = self.__transition(
-                                state=state, action=pending_action, consuption=0
+                                state=state, action=pending_action, consumption=0
                             )
                             orders.remove((pending_action, order_unit))
 
                 # Apply consumption for the current unit
                 new_state = self.__transition(
-                    state=state, action="no", consuption=self.forecast[unit]
+                    state=state, action="no", consumption=self.forecast[unit]
                 )
 
                 # Get the reward
